@@ -26,7 +26,7 @@ curl http://89.36.210.40:8085/api/user
 or use the html client provided
 
 
-#### Additional docker info
+#### Additional docker info
 To build your custom image run the following command in the root of the project:
 docker build --no-cache -t yourusername/gamma:latest .
 
