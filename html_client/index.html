@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<script>
+    var uri = 'http://localhost:5000/api/user';
+    var uri = 'http://89.36.210.40:8085/api/user';
+</script>
+<head>
+    <title>Gamma App</title>
+    <link rel="stylesheet" type="text/css"
+          href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
+</head>
+<body>
+<div class="container">
+    <h2>Users</h2>
+    <table class="table table-striped">
+        <thead>
+        <tr id="tablehead">
+        </tr>
+        </thead>
+        <tbody id="tablebody">
+        </tbody>
+    </table>
+</div>
+
+<div class="container">
+    <h2>Search by ID</h2>
+    <input type="text" id="userId"/>
+    <input type="button" value="Search" onclick="find();"/>
+</div>
+
+<script src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.bundle.min.js"></script>
+
+<script>
+
+    uri = noTrailingSlash(uri);
+    
+    $(document).ready(function () {
+        // Send an AJAX request
+        executeAjaxCall(uri);
+    });
+
+    function find() {
+        var id = $('#userId').val();
+        id = $.trim(id);
+        if (id.length > 0) {
+            executeAjaxCall(uri + '/' + id);
+        } else {
+            executeAjaxCall(uri);
+        }
+    }
+
+    function executeAjaxCall(uri){
+        // Send an AJAX request
+        $.getJSON(uri)
+            .done(function (data) {
+                var columns = grabColumnNames(data);
+                updateTableHeaders(columns);
+                updateTableRows(data,columns);
+            })
+            .fail(function (jqXHR, textStatus, err) {
+                alert("User not found");
+            });
+    }
+
+    function grabColumnNames(data) {
+        data = arrayize(data);
+        var my_columns = [];
+        $.each(data[0], function (key, value) {
+            my_columns.push(key);
+        });
+        return my_columns;
+    }
+
+    function updateTableHeaders(columns) {
+        $('#tablehead').html('');
+        $.each(columns, function (i, item) {
+            $("<th scope='col'>").text(item).append().appendTo('#tablehead');
+        });
+    }
+
+    function updateTableRows(data,columns) {
+        data = arrayize(data);
+        $('#tablebody').html('');
+        $.each(data, function (i, item) {
+            this.item = item;
+            this.td = "";
+            var self = this;
+            $.each(columns, function (j, column) {
+                var tdtext = '<td>'+self.item[column]+'</td>';
+                self.td += tdtext;
+            });
+            $('<tr>').append(self.td).appendTo('#tablebody');
+        });
+    }
+
+    // Just receive always a multidimensional array/object
+    function arrayize(data){
+        var tmp = [];
+        if(typeof data[0] === 'undefined') {
+            tmp[0] = data;
+        }else{
+            tmp = data;
+        }
+        return tmp;
+    }
+
+    function noTrailingSlash(uri)
+    {
+        return uri.replace(/\/+$/, "");
+    }
+
+</script>
+
+</body>
+</html>
